@@ -42,6 +42,9 @@ Enumerable.prototype.filter.prototype = Enumerable.prototype;
 Enumerable.prototype.flatMap.prototype = Enumerable.prototype;
 Enumerable.prototype.concat.prototype = Enumerable.prototype;
 
+const sad = "Show all data";
+const vis = "View in Salesforce";
+
 // @param didUpdate: A callback function to listen for updates to describe data
 export function DescribeInfo(spinFor, didUpdate) {
   function initialState() {
@@ -154,9 +157,10 @@ export function copyToClipboard(value) {
 
 function renderCell(rt, cell, td) {
   function popLink(recordInfo, label) {
+    let div = document.createElement("div");
     let a = document.createElement("a");
     a.href = "about:blank";
-    a.title = "Show all data";
+    a.title = sad;
     a.addEventListener("click", e => {
       e.preventDefault();
       let pop = document.createElement("div");
@@ -165,24 +169,15 @@ function renderCell(rt, cell, td) {
       let {objectTypes, recordId} = recordInfo();
       for (let objectType of objectTypes) {
         let aShow = document.createElement("a");
-        let args = new URLSearchParams();
-        args.set("host", rt.sfHost);
-        args.set("objectType", objectType);
-        if (rt.isTooling) {
-          args.set("useToolingApi", "1");
-        }
-        if (recordId) {
-          args.set("recordId", recordId);
-        }
-        aShow.href = "inspect.html?" + args;
-        aShow.textContent = "Show all data";
+        aShow.href = generateShowRecordHref("sa", rt, objectType, recordId);
+        aShow.textContent = sad;
         pop.appendChild(aShow);
       }
       // If the recordId ends with 0000000000AAA it is a dummy ID such as the ID for the master record type 012000000000000AAA
       if (recordId && isRecordId(recordId) && !recordId.endsWith("0000000000AAA")) {
         let aView = document.createElement("a");
-        aView.href = "https://" + rt.sfHost + "/" + recordId;
-        aView.textContent = "View in Salesforce";
+        aView.href = generateShowRecordHref("sf", rt, null, recordId);
+        aView.textContent = vis;
         pop.appendChild(aView);
       }
       function closer(ev) {
@@ -194,7 +189,87 @@ function renderCell(rt, cell, td) {
       addEventListener("click", closer);
     });
     a.textContent = label;
-    td.appendChild(a);
+    if (a.innerText && isRecordId(a.innerText)) {      
+      let actions = [];
+
+      actions.push(generateActionIcon(
+        new Map([
+        ["src","./svgs/copy_to_clipboard.svg"],
+        ["class", "action-icon"],
+        ["title", "Copy to clipboard"],
+      ]), e => {
+        navigator.clipboard.writeText(a.innerText);
+        e.target.setAttribute("src", "./svgs/sf_check.svg");
+        setTimeout(() => {e.target.setAttribute("src", "./svgs/copy_to_clipboard.svg")}, 3000);
+      }));
+
+      actions.push(generateActionIcon(
+        new Map([
+        ["src","./svgs/sf_open.svg"],
+        ["class", "action-icon"],
+        ["title", vis],
+      ]), e => {
+        let {recordId} = recordInfo();
+        window.open(generateShowRecordHref("sf", rt, null, recordId), "_blank");
+      }));
+
+      actions.push(generateActionIcon(
+        new Map([
+        ["src","./svgs/sf_zoomin.svg"],
+        ["class", "action-icon"],
+        ["title", sad],
+      ]), e => {
+        let {objectTypes, recordId} = recordInfo();
+        console.log(objectTypes);
+        for (let objectType of objectTypes) {
+          window.open(generateShowRecordHref("sa", rt, objectType, recordId), "_blank");
+          break;
+        }
+      }));
+
+      actions.forEach(action => {
+        div.appendChild(action);
+      });
+    }    
+    div.appendChild(a);
+    td.appendChild(div);
+  }
+  function generateShowRecordHref(type, rt, objectType, recordId) {
+    let href = ""
+    switch (type) {
+      case "sf":
+        href = "https://" + rt.sfHost + "/" + recordId;
+        break;
+      case "sa":
+        let args = new URLSearchParams();
+        args.set("host", rt.sfHost);
+        args.set("objectType", objectType);
+        if (rt.isTooling) {
+          args.set("useToolingApi", "1");
+        }
+        if (recordId) {
+          args.set("recordId", recordId);
+        }
+        href = "inspect.html?" + args;
+        break;    
+      default:
+        href = "#"
+        break;
+    }
+    return href;
+  }
+  function generateActionIcon(params, action) {
+    let img = document.createElement("img");
+
+    for (var key of params.keys()) {
+        if (key != "elementType") {
+            img.setAttribute(key, params.get(key));
+        }
+    }
+    img.addEventListener("click", action);
+
+    return img;
+    
   }
   function isRecordId(recordId) {
     // We assume a string is a Salesforce ID if it is 18 characters,

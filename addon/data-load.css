@@ -27,3 +27,11 @@
 .pop-menu a {
   display: block;
 }
+.action-icon {
+  margin: 0 0.4em 0 0.1em;
+  transition: transform .2s;
+  width: 1.0em;
+}
+.action-icon:hover {
+  transform: scale(1.3);
+}
