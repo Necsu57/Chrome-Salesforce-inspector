@@ -296,3 +296,14 @@ ul.small-tabs li:hover {
   vertical-align: middle;
   opacity: 70%;
 }
+.action-icon-console {
+    background-color: #00396b;
+    border-radius: 0.5em;
+    float: right;
+    padding: 0.3em;
+    transition: transform .2s;
+    width: 1.5em;
+}
+.action-icon-console:hover {
+    transform: scale(1.3);
+}

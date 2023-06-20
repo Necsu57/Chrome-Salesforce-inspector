@@ -2,6 +2,9 @@
 import {sfConn, apiVersion} from "./inspector.js";
 import {getAllFieldSetupLinks} from "./setup-links.js";
 
+const DEV_CONSOLE_PATH = "/_ui/common/apex/debug/ApexCSIPage";
+const SETUP_HOME_PATH = "/lightning/setup/SetupOneHome/home";
+
 let h = React.createElement;
 
 {
@@ -334,7 +337,11 @@ class AllDataBox extends React.PureComponent {
       h("div", {className: "all-data-box " + (this.isLoading() ? "loading " : "")},
         h("ul", {className: "small-tabs"},
           h("li", {onClick: this.onAspectClick, "data-aspect": this.SearchAspectTypes.sobject, className: (activeSearchAspect == this.SearchAspectTypes.sobject) ? "active" : ""}, "Objects"),
-          h("li", {onClick: this.onAspectClick, "data-aspect": this.SearchAspectTypes.users, className: (activeSearchAspect == this.SearchAspectTypes.users) ? "active" : ""}, "Users")
+          h("li", {onClick: this.onAspectClick, "data-aspect": this.SearchAspectTypes.users, className: (activeSearchAspect == this.SearchAspectTypes.users) ? "active" : ""}, "Users"),
+          h("li", {onClick: () => { window.open("https:" + sfHost + DEV_CONSOLE_PATH, "_blank") }, 
+                  style: {backgroundColor: "inherit", borderRight: "unset"}},
+            h("img", {src: "./svgs/terminal-solid.svg", className: "action-icon-console", title: "Developer Console"})
+          )
         ),
 
         (activeSearchAspect == this.SearchAspectTypes.sobject)
