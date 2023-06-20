@@ -194,13 +194,13 @@ function renderCell(rt, cell, td) {
 
       actions.push(generateActionIcon(
         new Map([
-        ["src","./svgs/copy_to_clipboard.svg"],
+        ["src","./svgs/sf_copyToClipboard.svg"],
         ["class", "action-icon"],
         ["title", "Copy to clipboard"],
       ]), e => {
         navigator.clipboard.writeText(a.innerText);
         e.target.setAttribute("src", "./svgs/sf_check.svg");
-        setTimeout(() => {e.target.setAttribute("src", "./svgs/copy_to_clipboard.svg")}, 3000);
+        setTimeout(() => {e.target.setAttribute("src", "./svgs/sf_copyToClipboard.svg")}, 3000);
       }));
 
       actions.push(generateActionIcon(
