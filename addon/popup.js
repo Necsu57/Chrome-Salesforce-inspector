@@ -338,6 +338,10 @@ class AllDataBox extends React.PureComponent {
         h("ul", {className: "small-tabs"},
           h("li", {onClick: this.onAspectClick, "data-aspect": this.SearchAspectTypes.sobject, className: (activeSearchAspect == this.SearchAspectTypes.sobject) ? "active" : ""}, "Objects"),
           h("li", {onClick: this.onAspectClick, "data-aspect": this.SearchAspectTypes.users, className: (activeSearchAspect == this.SearchAspectTypes.users) ? "active" : ""}, "Users"),
+          h("li", {onClick: () => { window.open("https:" + sfHost + SETUP_HOME_PATH, "_blank") }, 
+                  style: {backgroundColor: "inherit", borderRight: "unset"}},
+            h("img", {src: "./svgs/sf_setup.svg", className: "action-icon-setup", title: "Setup (Lightning)"})
+          ),
           h("li", {onClick: () => { window.open("https:" + sfHost + DEV_CONSOLE_PATH, "_blank") }, 
                   style: {backgroundColor: "inherit", borderRight: "unset"}},
             h("img", {src: "./svgs/terminal-solid.svg", className: "action-icon-console", title: "Developer Console"})
